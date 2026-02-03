@@ -34,20 +34,6 @@ export const LiveAvatarDemo = () => {
     }
   };
 
-  const handleStartCustom = async () => {
-    const res = await fetch("/api/start-custom-session", {
-      method: "POST",
-    });
-    if (!res.ok) {
-      const error = await res.json();
-      setError(error.error);
-      return;
-    }
-    const { session_token } = await res.json();
-    setSessionToken(session_token);
-    setMode("CUSTOM");
-  };
-
   const onSessionStopped = () => {
     // Reset the FE state
     setSessionToken("");
@@ -73,23 +59,9 @@ export const LiveAvatarDemo = () => {
           )}
           <button
             onClick={() => handleStartFullSession(false)}
-            className="w-fit bg-white text-black px-4 py-2 rounded-md"
+            className="w-fit bg-white text-black px-4 py-2 rounded-md border border-zinc-300"
           >
             Start Full Avatar Session
-          </button>
-
-          <button
-            onClick={() => handleStartFullSession(true)}
-            className="w-fit bg-white text-black px-4 py-2 rounded-md"
-          >
-            Start Full Avatar Session (Push To Talk)
-          </button>
-
-          <button
-            onClick={handleStartCustom}
-            className="w-fit bg-white text-black px-4 py-2 rounded-md"
-          >
-            Start Custom Avatar Session
           </button>
         </>
       ) : (

@@ -20,7 +20,7 @@ const Button: React.FC<{
     <button
       onClick={onClick}
       disabled={disabled}
-      className="bg-white text-black px-4 py-2 rounded-md"
+      className="bg-white text-black px-4 py-2 rounded-md border border-zinc-300"
     >
       {children}
     </button>
@@ -64,6 +64,8 @@ const LiveAvatarSessionComponent: React.FC<{
   const textChatMode = mode === "FULL_PTT" ? "FULL" : mode;
   const { sendMessage } = useTextChat(textChatMode);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     if (sessionState === SessionState.DISCONNECTED) {
@@ -82,6 +84,25 @@ const LiveAvatarSessionComponent: React.FC<{
       startSession();
     }
   }, [startSession, sessionState]);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+
+  const toggleFullscreen = async () => {
+    if (!containerRef.current) return;
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+      return;
+    }
+    await containerRef.current.requestFullscreen();
+  };
 
   const VoiceChatComponents = (
     <>
@@ -143,13 +164,44 @@ const LiveAvatarSessionComponent: React.FC<{
 
   return (
     <div className="w-[1080px] max-w-full h-full flex flex-col items-center justify-center gap-4 py-4">
-      <div className="relative w-full aspect-video overflow-hidden flex flex-col items-center justify-center">
+      <div
+        ref={containerRef}
+        className="relative w-full aspect-video overflow-hidden flex flex-col items-center justify-center bg-black"
+      >
         <video
           ref={videoRef}
           autoPlay
           playsInline
           className="w-full h-full object-contain"
         />
+        <div className="absolute top-4 left-4 flex items-center gap-2">
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              isActive && !isMuted
+                ? "bg-emerald-500 text-white"
+                : "bg-zinc-200 text-zinc-700"
+            }`}
+          >
+            Listening
+          </span>
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              isAvatarTalking
+                ? "bg-indigo-500 text-white"
+                : "bg-zinc-200 text-zinc-700"
+            }`}
+          >
+            Speaking
+          </span>
+        </div>
+        <button
+          className="absolute top-4 right-4 bg-white text-black px-3 py-2 rounded-md"
+          onClick={toggleFullscreen}
+          aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+          title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+        >
+          {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+        </button>
         <button
           className="absolute bottom-4 right-4 bg-white text-black px-4 py-2 rounded-md"
           onClick={() => stopSession()}

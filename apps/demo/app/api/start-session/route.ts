@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
         mode: "FULL",
         avatar_id: AVATAR_ID,
         avatar_persona: {
-          voice_id: VOICE_ID,
+          ...(VOICE_ID ? { voice_id: VOICE_ID } : {}),
           context_id: CONTEXT_ID,
           language: LANGUAGE,
         },
