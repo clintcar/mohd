@@ -1,4 +1,4 @@
-export const API_KEY = process.env.LIVEAVATAR_API_KEY ?? "";
+export const API_KEY = "82aa6f5f-fc13-11f0-a99e-066a7fa2e369";
 export const API_URL =
   process.env.LIVEAVATAR_API_URL ?? "https://api.liveavatar.com";
 export const AVATAR_ID =
